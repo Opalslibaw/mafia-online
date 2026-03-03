@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mafia Online - Lobby</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: dark light;
+        --bg: #0f172a;
+        --bg-elevated: #111827;
+        --border: #1f2937;
+        --accent: #3b82f6;
+        --accent-soft: rgba(59, 130, 246, 0.15);
+        --accent-strong: #2563eb;
+        --text: #e5e7eb;
+        --text-muted: #9ca3af;
+        --danger: #ef4444;
+        --success: #22c55e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: radial-gradient(circle at top, #1f2937 0, var(--bg) 55%, #020617 100%);
+        color: var(--text);
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .shell {
+        width: 100%;
+        max-width: 1100px;
+        background: linear-gradient(145deg, #020617, #020617);
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow:
+          0 22px 60px rgba(15, 23, 42, 0.9),
+          0 0 0 1px rgba(15, 23, 42, 0.9);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: radial-gradient(circle at top left, #1e293b 0, #020617 60%);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      header h1 span.logo-dot {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 30%, #f97316, #dc2626);
+        box-shadow: 0 0 16px rgba(248, 113, 113, 0.9);
+      }
+
+      header .status {
+        font-size: 12px;
+        color: var(--text-muted);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+      }
+
+      header .pill {
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        font-size: 11px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      header .pill-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: #22c55e;
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 340px) minmax(0, 1.6fr);
+        gap: 0;
+        flex: 1;
+        min-height: 0;
+      }
+
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .panel {
+        padding: 20px 20px 18px 20px;
+        border-right: 1px solid var(--border);
+        background: radial-gradient(circle at top, #020617 0, #020617 55%, #020617 100%);
+      }
+
+      .panel + .panel {
+        border-right: none;
+        border-left: 1px solid var(--border);
+        background: radial-gradient(circle at top right, #020617 0, #020617 55%, #020617 100%);
+      }
+
+      .panel h2 {
+        margin: 0 0 12px 0;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #cbd5f5;
+      }
+
+      .sub {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+      }
+
+      .section {
+        border-radius: 12px;
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98));
+        padding: 14px 14px 12px 14px;
+        margin-bottom: 12px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .section-header h3 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #e5e7eb;
+      }
+
+      .badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        color: var(--text-muted);
+      }
+
+      label {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 4px;
+        color: var(--text-muted);
+      }
+
+      input {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        background: #020617;
+        color: var(--text);
+        padding: 8px 9px;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      }
+
+      input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
+        background: #020617;
+      }
+
+      .field {
+        margin-bottom: 8px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      button {
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+        color: #e5e7eb;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 7px 14px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition:
+          background 0.15s ease,
+          transform 0.08s ease,
+          box-shadow 0.15s ease,
+          border-color 0.15s ease;
+        white-space: nowrap;
+      }
+
+      button.secondary {
+        background: transparent;
+        border-color: rgba(148, 163, 184, 0.6);
+        color: #e5e7eb;
+      }
+
+      button.danger {
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+      }
+
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+        box-shadow: none;
+      }
+
+      button:not(:disabled):hover {
+        transform: translateY(-0.5px);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.9);
+      }
+
+      .pill-small {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        background: #020617;
+        color: var(--text-muted);
+      }
+
+      .divider-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin: 8px 0 6px 0;
+      }
+
+      .lobby-main {
+        display: flex;
+        flex-direction: column;
+        padding: 20px 20px 18px 20px;
+        min-height: 0;
+      }
+
+      .lobby-main-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        gap: 10px;
+      }
+
+      .room-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .room-meta strong {
+        color: var(--text);
+      }
+
+      .player-list {
+        flex: 1;
+        min-height: 0;
+        border-radius: 12px;
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 1));
+        padding: 10px 10px 6px 10px;
+        overflow: auto;
+      }
+
+      .player-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) 80px 80px;
+        gap: 8px;
+        padding: 7px 8px;
+        border-radius: 8px;
+        align-items: center;
+        font-size: 13px;
+      }
+
+      .player-row:nth-child(odd) {
+        background: rgba(15, 23, 42, 0.6);
+      }
+
+      .player-row:nth-child(even) {
+        background: rgba(15, 23, 42, 0.85);
+      }
+
+      .player-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .player-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 20%, #4ade80, #0f766e);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #022c22;
+        font-weight: 600;
+      }
+
+      .player-meta {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .ready-pill {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        text-align: center;
+      }
+
+      .ready-yes {
+        border: 1px solid rgba(34, 197, 94, 0.8);
+        color: #bbf7d0;
+        background: rgba(22, 163, 74, 0.25);
+      }
+
+      .ready-no {
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        color: var(--text-muted);
+        background: rgba(15, 23, 42, 0.7);
+      }
+
+      .host-chip {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        border: 1px solid rgba(234, 179, 8, 0.8);
+        color: #facc15;
+        background: rgba(24, 20, 3, 0.7);
+      }
+
+      .log {
+        margin-top: 10px;
+        font-size: 11px;
+        color: var(--text-muted);
+        max-height: 72px;
+        overflow: auto;
+        border-radius: 9px;
+        border: 1px dashed rgba(55, 65, 81, 0.9);
+        padding: 6px 8px;
+      }
+
+      .log-line {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .log-line strong {
+        color: var(--text);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <h1>
+          <span class="logo-dot"></span>
+          Mafia Online Lobby
+        </h1>
+        <div class="status">
+          <div class="pill">
+            <span class="pill-dot" id="conn-dot"></span>
+            <span id="conn-label">Disconnected</span>
+          </div>
+          <div id="user-label">Belum login</div>
+        </div>
+      </header>
+      <main>
+        <section class="panel">
+          <h2>Auth &amp; Room</h2>
+          <div class="sub">
+            Login dulu, lalu buat room baru atau join dengan kode untuk mulai permainan.
+          </div>
+
+          <div class="section" id="auth-section">
+            <div class="section-header">
+              <h3>Authentication</h3>
+              <span class="badge" id="auth-mode-label">REGISTER</span>
+            </div>
+            <form id="auth-form">
+              <div class="field" id="field-username">
+                <label for="username">Username</label>
+                <input id="username" name="username" autocomplete="username" />
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" />
+              </div>
+              <div class="field">
+                <label for="password">Password</label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                />
+              </div>
+              <div class="actions">
+                <button type="submit" id="auth-submit">Register</button>
+                <button type="button" class="secondary" id="toggle-auth-mode">
+                  Punya akun? Login
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="section" id="room-section" style="display: none">
+            <div class="section-header">
+              <h3>Room</h3>
+              <span class="badge" id="room-status-label">Belum join room</span>
+            </div>
+            <div class="field">
+              <label for="room-code-input">Join dengan Kode</label>
+              <input
+                id="room-code-input"
+                name="roomCode"
+                placeholder="Contoh: ABC123"
+                maxlength="6"
+              />
+            </div>
+            <div class="actions">
+              <button type="button" id="btn-create-room">Buat Room</button>
+              <button type="button" class="secondary" id="btn-join-room">Join Room</button>
+            </div>
+          </div>
+
+          <div class="section" id="controls-section" style="display: none">
+            <div class="section-header">
+              <h3>Controls</h3>
+              <span class="badge" id="phase-label">WAITING</span>
+            </div>
+            <div class="actions">
+              <button type="button" id="btn-ready">Toggle Ready</button>
+              <button type="button" id="btn-start" class="danger" style="display: none">
+                Start Game (Host)
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="lobby-main">
+          <div class="lobby-main-top">
+            <div class="room-meta">
+              <div>
+                Room code:
+                <strong id="room-code-display">-</strong>
+              </div>
+              <div>
+                Players:
+                <strong id="room-player-count">0</strong>
+              </div>
+            </div>
+            <div>
+              <span class="pill-small" id="room-state-chip">WAITING</span>
+            </div>
+          </div>
+
+          <div class="player-list" id="player-list"></div>
+
+          <div class="log" id="log"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://mafia-online-production-e4c1.up.railway.app/socket.io/socket.io.js"></script>
+    <script>
+      (function () {
+        const API_BASE = 'https://mafia-online-production-e4c1.up.railway.app';
+
+        const connDot = document.getElementById('conn-dot');
+        const connLabel = document.getElementById('conn-label');
+        const userLabel = document.getElementById('user-label');
+
+        const authSection = document.getElementById('auth-section');
+        const roomSection = document.getElementById('room-section');
+        const controlsSection = document.getElementById('controls-section');
+
+        const authForm = document.getElementById('auth-form');
+        const authModeLabel = document.getElementById('auth-mode-label');
+        const authSubmit = document.getElementById('auth-submit');
+        const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
+        const fieldUsername = document.getElementById('field-username');
+        const inputUsername = document.getElementById('username');
+        const inputEmail = document.getElementById('email');
+        const inputPassword = document.getElementById('password');
+
+        const roomStatusLabel = document.getElementById('room-status-label');
+        const roomCodeInput = document.getElementById('room-code-input');
+        const btnCreateRoom = document.getElementById('btn-create-room');
+        const btnJoinRoom = document.getElementById('btn-join-room');
+
+        const btnReady = document.getElementById('btn-ready');
+        const btnStart = document.getElementById('btn-start');
+        const phaseLabel = document.getElementById('phase-label');
+
+        const roomCodeDisplay = document.getElementById('room-code-display');
+        const roomPlayerCount = document.getElementById('room-player-count');
+        const roomStateChip = document.getElementById('room-state-chip');
+        const playerListEl = document.getElementById('player-list');
+        const logEl = document.getElementById('log');
+
+        let authMode = 'register';
+        let token = null;
+        let currentUser = null;
+        let socket = null;
+        let currentRoom = null;
+
+        function log(message) {
+          const line = document.createElement('div');
+          line.className = 'log-line';
+          const ts = new Date().toLocaleTimeString();
+          line.textContent = '[' + ts + '] ' + message;
+          logEl.prepend(line);
+        }
+
+        function setConnected(connected) {
+          if (connected) {
+            connDot.style.background = '#22c55e';
+            connDot.style.boxShadow = '0 0 10px rgba(34,197,94,0.9)';
+            connLabel.textContent = 'Connected';
+          } else {
+            connDot.style.background = '#ef4444';
+            connDot.style.boxShadow = '0 0 10px rgba(239,68,68,0.9)';
+            connLabel.textContent = 'Disconnected';
+          }
+        }
+
+        function updateAuthUI() {
+          if (!currentUser) {
+            authSection.style.display = 'block';
+            roomSection.style.display = 'none';
+            controlsSection.style.display = 'none';
+            userLabel.textContent = 'Belum login';
+          } else {
+            authSection.style.display = 'none';
+            roomSection.style.display = 'block';
+            controlsSection.style.display = 'block';
+            userLabel.textContent = 'Login sebagai ' + currentUser.username;
+          }
+        }
+
+        function updateRoomUI(room, players) {
+          currentRoom = room || null;
+          const list = Array.isArray(players) ? players : [];
+
+          if (!room) {
+            roomCodeDisplay.textContent = '-';
+            roomPlayerCount.textContent = '0';
+            roomStateChip.textContent = 'WAITING';
+            roomStatusLabel.textContent = 'Belum join room';
+            btnStart.style.display = 'none';
+            playerListEl.innerHTML = '';
+            return;
+          }
+
+          roomCodeDisplay.textContent = room.code || '-';
+          roomPlayerCount.textContent = String(list.length);
+          roomStateChip.textContent = (room.status || 'waiting').toUpperCase();
+          roomStatusLabel.textContent = 'Di room ' + room.code;
+
+          const isHost = currentUser && String(currentUser.id) === String(room.hostId);
+          btnStart.style.display = isHost && room.status === 'waiting' ? 'inline-flex' : 'none';
+
+          playerListEl.innerHTML = '';
+          list.forEach((p) => {
+            const row = document.createElement('div');
+            row.className = 'player-row';
+
+            const colName = document.createElement('div');
+            colName.className = 'player-name';
+            const avatar = document.createElement('div');
+            avatar.className = 'player-avatar';
+            avatar.textContent = (p.username || '?').charAt(0).toUpperCase();
+            const nameWrap = document.createElement('div');
+            const nameText = document.createElement('div');
+            nameText.textContent = p.username || 'Unknown';
+            const meta = document.createElement('div');
+            meta.className = 'player-meta';
+            if (p.id === (currentUser && currentUser.id)) {
+              meta.textContent = 'You';
+            } else if (p.isHost) {
+              meta.textContent = 'Host';
+            } else {
+              meta.textContent = '';
+            }
+            nameWrap.appendChild(nameText);
+            nameWrap.appendChild(meta);
+            colName.appendChild(avatar);
+            colName.appendChild(nameWrap);
+
+            const colHost = document.createElement('div');
+            if (p.isHost) {
+              const chip = document.createElement('span');
+              chip.className = 'host-chip';
+              chip.textContent = 'HOST';
+              colHost.appendChild(chip);
+            }
+
+            const colReady = document.createElement('div');
+            const ready = document.createElement('div');
+            ready.className =
+              'ready-pill ' + (p.isReady ? 'ready-yes' : 'ready-no');
+            ready.textContent = p.isReady ? 'READY' : 'NOT READY';
+            colReady.appendChild(ready);
+
+            row.appendChild(colName);
+            row.appendChild(colHost);
+            row.appendChild(colReady);
+
+            playerListEl.appendChild(row);
+          });
+        }
+
+        function updatePhaseLabel(phase) {
+          phaseLabel.textContent = (phase || 'waiting').toUpperCase();
+          roomStateChip.textContent = phaseLabel.textContent;
+        }
+
+        function connectSocket() {
+          if (!token || !window.io) return;
+
+          if (socket) {
+            socket.disconnect();
+            socket = null;
+          }
+
+          socket = io(API_BASE, {
+            auth: { token },
+            transports: ['websocket', 'polling']
+          });
+
+          socket.on('connect', () => {
+            setConnected(true);
+            log('Socket connected as ' + (currentUser && currentUser.username));
+            if (currentRoom && currentRoom.code) {
+              socket.emit('room:join', { roomCode: currentRoom.code });
+            }
+          });
+
+          socket.on('disconnect', () => {
+            setConnected(false);
+            log('Socket disconnected');
+          });
+
+          socket.on('room:updated', (payload) => {
+            updateRoomUI(payload.room, payload.players);
+          });
+
+          socket.on('room:error', (payload) => {
+            log('Room error: ' + (payload && payload.message));
+          });
+
+          socket.on('game:phase_changed', (payload) => {
+            updatePhaseLabel(payload && payload.phase);
+            log(
+              'Phase changed to ' +
+                payload.phase +
+                ' (durasi ' +
+                (payload.duration || 0) +
+                's)'
+            );
+          });
+
+          socket.on('game:error', (payload) => {
+            log('Game error: ' + (payload && payload.message));
+          });
+        }
+
+        async function apiRequest(path, options) {
+          const res = await fetch(API_BASE + path, {
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { Authorization: 'Bearer ' + token } : {})
+            },
+            ...options
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || data.ok === false) {
+            const msg = data && data.error ? data.error : 'Request gagal';
+            throw new Error(msg);
+          }
+          return data;
+        }
+
+        toggleAuthModeBtn.addEventListener('click', () => {
+          authMode = authMode === 'register' ? 'login' : 'register';
+          if (authMode === 'register') {
+            authModeLabel.textContent = 'REGISTER';
+            authSubmit.textContent = 'Register';
+            toggleAuthModeBtn.textContent = 'Punya akun? Login';
+            fieldUsername.style.display = 'block';
+          } else {
+            authModeLabel.textContent = 'LOGIN';
+            authSubmit.textContent = 'Login';
+            toggleAuthModeBtn.textContent = 'Belum punya akun? Register';
+            fieldUsername.style.display = 'none';
+          }
+        });
+
+        authForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const email = inputEmail.value.trim();
+          const password = inputPassword.value;
+          const username = inputUsername.value.trim();
+
+          try {
+            let data;
+            if (authMode === 'register') {
+              data = await apiRequest('/api/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({ username, email, password })
+              });
+            } else {
+              data = await apiRequest('/api/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password })
+              });
+            }
+
+            token = data.token;
+            currentUser = data.user || data.user || data.user;
+            if (!currentUser && data.user) currentUser = data.user;
+            if (!currentUser && data.user) currentUser = data.user;
+
+            // backend mengirim user di key "user"
+            currentUser = data.user || currentUser;
+
+            updateAuthUI();
+            connectSocket();
+            log('Authenticated as ' + (currentUser && currentUser.username));
+          } catch (err) {
+            log('Auth error: ' + err.message);
+          }
+        });
+
+        btnCreateRoom.addEventListener('click', async () => {
+          try {
+            const data = await apiRequest('/api/rooms/create', {
+              method: 'POST',
+              body: JSON.stringify({})
+            });
+            const room = data.room;
+            currentRoom = room;
+            roomCodeInput.value = room.code || '';
+            log('Room created with code ' + room.code);
+            if (socket) {
+              socket.emit('room:join', { roomCode: room.code });
+            }
+          } catch (err) {
+            log('Create room error: ' + err.message);
+          }
+        });
+
+        btnJoinRoom.addEventListener('click', async () => {
+          const code = roomCodeInput.value.trim().toUpperCase();
+          if (!code) {
+            log('Isi kode room dulu');
+            return;
+          }
+          try {
+            const data = await apiRequest('/api/rooms/join', {
+              method: 'POST',
+              body: JSON.stringify({ code })
+            });
+            currentRoom = data.room;
+            log('Joined room ' + data.room.code);
+            if (socket) {
+              socket.emit('room:join', { roomCode: data.room.code });
+            }
+          } catch (err) {
+            log('Join room error: ' + err.message);
+          }
+        });
+
+        btnReady.addEventListener('click', () => {
+          if (!socket || !currentRoom) return;
+          socket.emit('room:ready', { roomCode: currentRoom.code });
+        });
+
+        btnStart.addEventListener('click', () => {
+          if (!socket || !currentRoom) return;
+          socket.emit('game:start', { roomId: currentRoom.id });
+        });
+
+        // Initial UI
+        updateAuthUI();
+        setConnected(false);
+      })();
+    </script>
+  </body>
+</html>
+

@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mafia Online - Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #020617;
+        --bg-elevated: #020617;
+        --panel: #020617;
+        --panel-soft: #020617;
+        --border: #1f2937;
+        --accent: #3b82f6;
+        --accent-soft: rgba(59, 130, 246, 0.15);
+        --text: #e5e7eb;
+        --text-muted: #9ca3af;
+        --danger: #ef4444;
+        --success: #22c55e;
+        --role-mafia: #ef4444;
+        --role-doctor: #22c55e;
+        --role-detective: #38bdf8;
+        --role-villager: #fb923c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at top, #020617 0, #020617 55%, #020617 100%);
+        color: var(--text);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .shell {
+        width: 100%;
+        max-width: 1200px;
+        background: #020617;
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        box-shadow:
+          0 22px 60px rgba(15, 23, 42, 0.95),
+          0 0 0 1px rgba(15, 23, 42, 0.9);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        padding: 12px 18px;
+        border-bottom: 1px solid var(--border);
+        background: radial-gradient(circle at top left, #0b1120 0, #020617 60%);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .title-block {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .title-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: conic-gradient(
+          from 210deg,
+          #ef4444,
+          #f97316,
+          #22c55e,
+          #38bdf8,
+          #ef4444
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 24px rgba(248, 250, 252, 0.2);
+      }
+
+      .title-logo-inner {
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: #020617;
+        border: 2px solid rgba(15, 23, 42, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', system-ui, sans-serif;
+        font-size: 18px;
+        letter-spacing: 0.1em;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: 'Bebas Neue', system-ui, sans-serif;
+        font-size: 26px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .header-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+      }
+
+      .label-mono {
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      .phase-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+      }
+
+      .phase-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #6b7280;
+      }
+
+      .phase-night {
+        border-color: rgba(59, 130, 246, 0.8);
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .phase-night .phase-dot {
+        background: #38bdf8;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+      }
+
+      .phase-discussion {
+        border-color: rgba(34, 197, 94, 0.8);
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .phase-discussion .phase-dot {
+        background: #22c55e;
+        box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+      }
+
+      .phase-voting {
+        border-color: rgba(251, 146, 60, 0.9);
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .phase-voting .phase-dot {
+        background: #fb923c;
+        box-shadow: 0 0 12px rgba(251, 146, 60, 0.9);
+      }
+
+      .phase-result {
+        border-color: rgba(148, 163, 184, 0.8);
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .timer {
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        font-size: 14px;
+        padding: 2px 0;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.1fr) minmax(0, 0.9fr);
+        flex: 1;
+        min-height: 0;
+      }
+
+      @media (max-width: 1000px) {
+        main {
+          grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+          grid-template-rows: auto auto;
+        }
+      }
+
+      @media (max-width: 780px) {
+        main {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: auto auto auto;
+        }
+      }
+
+      .column {
+        border-right: 1px solid var(--border);
+        padding: 14px 14px 12px 14px;
+        background: #020617;
+        min-height: 0;
+      }
+
+      .column:last-child {
+        border-right: none;
+      }
+
+      .col-title {
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+
+      .card {
+        border-radius: 12px;
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        background: radial-gradient(circle at top left, #020617, #020617);
+        padding: 10px 10px 8px 10px;
+      }
+
+      .card + .card {
+        margin-top: 10px;
+      }
+
+      .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .role-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+      }
+
+      .role-mafia {
+        border: 1px solid var(--role-mafia);
+        background: rgba(127, 29, 29, 0.7);
+        color: #fecaca;
+      }
+
+      .role-mafia .role-dot {
+        background: var(--role-mafia);
+      }
+
+      .role-doctor {
+        border: 1px solid var(--role-doctor);
+        background: rgba(6, 95, 70, 0.7);
+        color: #bbf7d0;
+      }
+
+      .role-doctor .role-dot {
+        background: var(--role-doctor);
+      }
+
+      .role-detective {
+        border: 1px solid var(--role-detective);
+        background: rgba(15, 23, 42, 0.8);
+        color: #e0f2fe;
+      }
+
+      .role-detective .role-dot {
+        background: var(--role-detective);
+      }
+
+      .role-villager {
+        border: 1px solid var(--role-villager);
+        background: rgba(180, 83, 9, 0.7);
+        color: #ffedd5;
+      }
+
+      .role-villager .role-dot {
+        background: var(--role-villager);
+      }
+
+      .player-list {
+        margin-top: 6px;
+        max-height: 260px;
+        overflow: auto;
+      }
+
+      .player-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) 60px 70px;
+        gap: 6px;
+        align-items: center;
+        padding: 6px 6px;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+
+      .player-row:nth-child(odd) {
+        background: rgba(15, 23, 42, 0.7);
+      }
+
+      .player-row:nth-child(even) {
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .player-row.dead {
+        opacity: 0.4;
+      }
+
+      .player-main {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .player-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 20%, #4ade80, #0f766e);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #022c22;
+        font-weight: 600;
+      }
+
+      .player-name {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .player-name-main {
+        font-size: 13px;
+      }
+
+      .player-tags {
+        display: flex;
+        gap: 4px;
+        margin-top: 1px;
+      }
+
+      .tag {
+        font-size: 10px;
+        padding: 2px 5px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        color: var(--text-muted);
+      }
+
+      .tag-you {
+        border-color: rgba(59, 130, 246, 0.9);
+        color: #bfdbfe;
+      }
+
+      .tag-host {
+        border-color: rgba(234, 179, 8, 0.9);
+        color: #facc15;
+      }
+
+      .tag-dead {
+        border-color: rgba(148, 163, 184, 0.7);
+        color: #9ca3af;
+      }
+
+      .ready-pill {
+        font-size: 11px;
+        padding: 3px 7px;
+        border-radius: 999px;
+        text-align: center;
+      }
+
+      .ready-yes {
+        border: 1px solid rgba(34, 197, 94, 0.8);
+        background: rgba(21, 128, 61, 0.5);
+        color: #bbf7d0;
+      }
+
+      .ready-no {
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        background: rgba(15, 23, 42, 0.8);
+        color: var(--text-muted);
+      }
+
+      .btn-small {
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        font-size: 11px;
+        padding: 4px 9px;
+        cursor: pointer;
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .btn-small.vote {
+        border-color: rgba(251, 146, 60, 0.9);
+        color: #fed7aa;
+      }
+
+      .btn-small:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+
+      .card-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+      }
+
+      .chip {
+        font-size: 11px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        color: var(--text-muted);
+      }
+
+      .night-panel {
+        display: none;
+        margin-top: 6px;
+        font-size: 12px;
+      }
+
+      .night-panel select {
+        width: 100%;
+        margin-top: 4px;
+        margin-bottom: 6px;
+        border-radius: 8px;
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        background: #020617;
+        color: var(--text);
+        padding: 6px 7px;
+        font-size: 13px;
+      }
+
+      .night-actions-row {
+        display: flex;
+        gap: 6px;
+      }
+
+      .night-btn {
+        flex: 1;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        background: rgba(15, 23, 42, 0.95);
+        color: #e5e7eb;
+        font-size: 11px;
+        padding: 5px 8px;
+        cursor: pointer;
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .night-btn.kill {
+        border-color: rgba(239, 68, 68, 0.9);
+        color: #fecaca;
+      }
+
+      .night-btn.heal {
+        border-color: rgba(34, 197, 94, 0.9);
+        color: #bbf7d0;
+      }
+
+      .night-btn.investigate {
+        border-color: rgba(56, 189, 248, 0.9);
+        color: #e0f2fe;
+      }
+
+      .tabs {
+        display: flex;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        padding: 2px;
+        gap: 2px;
+      }
+
+      .tab {
+        flex: 1;
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-radius: 999px;
+        padding: 4px 0;
+        text-align: center;
+        cursor: pointer;
+        color: var(--text-muted);
+      }
+
+      .tab.active {
+        background: #020617;
+        color: #e5e7eb;
+      }
+
+      .chat-messages {
+        margin-top: 6px;
+        max-height: 190px;
+        overflow: auto;
+        padding-right: 3px;
+        font-size: 12px;
+      }
+
+      .chat-line {
+        margin-bottom: 3px;
+      }
+
+      .chat-meta {
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        font-size: 10px;
+        color: var(--text-muted);
+      }
+
+      .chat-text {
+        font-size: 12px;
+      }
+
+      .chat-input-row {
+        display: flex;
+        gap: 6px;
+        margin-top: 6px;
+      }
+
+      .chat-input-row input {
+        flex: 1;
+        border-radius: 999px;
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        background: #020617;
+        color: var(--text);
+        padding: 6px 9px;
+        font-size: 13px;
+      }
+
+      .chat-input-row button {
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.8);
+        background: rgba(15, 23, 42, 0.95);
+        color: #e5e7eb;
+        font-size: 11px;
+        padding: 5px 11px;
+        cursor: pointer;
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .log-list {
+        max-height: 260px;
+        overflow: auto;
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .log-entry {
+        padding: 3px 3px;
+        border-radius: 6px;
+        margin-bottom: 2px;
+        color: var(--text-muted);
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+      }
+
+      .log-entry strong {
+        color: var(--text);
+      }
+
+      .win-overlay {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at top, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 40;
+      }
+
+      .win-card {
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        background: radial-gradient(circle at top, #020617 0, #020617 70%, #020617 100%);
+        padding: 26px 26px 22px 26px;
+        text-align: center;
+        max-width: 380px;
+      }
+
+      .win-title {
+        font-family: 'Bebas Neue', system-ui, sans-serif;
+        font-size: 34px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      .win-sub {
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+      }
+
+      .win-btn {
+        margin-top: 6px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.9);
+        background: rgba(15, 23, 42, 0.95);
+        color: #e5e7eb;
+        font-size: 12px;
+        padding: 7px 16px;
+        cursor: pointer;
+        font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .hint {
+        margin-top: 4px;
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <div class="title-block">
+          <div class="title-logo">
+            <div class="title-logo-inner">M</div>
+          </div>
+          <div>
+            <h1>Mafia Online</h1>
+            <div class="label-mono" id="room-label">Room: -</div>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="phase-pill" id="phase-pill">
+            <span class="phase-dot"></span>
+            <span id="phase-label">WAITING</span>
+          </div>
+          <div class="timer" id="timer-label">00:00</div>
+        </div>
+      </header>
+      <main>
+        <!-- LEFT COLUMN: players & role -->
+        <section class="column">
+          <div class="col-title">Players &amp; Role</div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Your Role</div>
+            </div>
+            <div id="role-badge-container">
+              <span class="role-badge role-villager" id="role-badge">
+                <span class="role-dot"></span>
+                <span id="role-label">UNKNOWN</span>
+              </span>
+            </div>
+            <div class="hint" id="role-hint">
+              Menunggu info role dari server...
+            </div>
+          </div>
+          <div class="card" style="margin-top: 10px">
+            <div class="card-header">
+              <div class="card-title">Players</div>
+              <span class="chip" id="player-count-label">0 alive</span>
+            </div>
+            <div class="player-list" id="player-list"></div>
+          </div>
+        </section>
+
+        <!-- MIDDLE COLUMN: night actions + voting -->
+        <section class="column">
+          <div class="col-title">Actions</div>
+          <div class="card" id="night-card">
+            <div class="card-header">
+              <div class="card-title">Night Action</div>
+              <span class="chip" id="night-chip">Only at night</span>
+            </div>
+            <div class="night-panel" id="night-panel">
+              <div class="label-mono" style="font-size: 10px; margin-bottom: 3px">
+                Target
+              </div>
+              <select id="night-target-select"></select>
+              <div class="night-actions-row" id="night-actions-row">
+                <button class="night-btn kill" data-action="kill" type="button">
+                  Kill
+                </button>
+                <button class="night-btn heal" data-action="heal" type="button">
+                  Heal
+                </button>
+                <button class="night-btn investigate" data-action="investigate" type="button">
+                  Investigate
+                </button>
+              </div>
+              <div class="hint" id="night-hint">
+                Aksi malam tergantung role kamu.
+              </div>
+            </div>
+            <div class="hint" id="night-locked-hint">
+              Night action hanya aktif saat phase <strong>night</strong>.
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 10px">
+            <div class="card-header">
+              <div class="card-title">Voting</div>
+              <span class="chip" id="voting-chip">Only at voting</span>
+            </div>
+            <div class="player-list" id="voting-list"></div>
+            <div class="hint">
+              Saat phase voting, pilih satu pemain untuk di-eliminasi.
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT COLUMN: chat + log -->
+        <section class="column">
+          <div class="col-title">Chat &amp; Log</div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Chat</div>
+              <span class="chip" id="chat-mode-chip">Discussion</span>
+            </div>
+            <div class="tabs">
+              <div class="tab active" id="tab-public" data-type="public">Public</div>
+              <div class="tab" id="tab-mafia" data-type="mafia">Mafia</div>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-row">
+              <input id="chat-input" placeholder="Ketik pesan..." maxlength="200" />
+              <button id="chat-send" type="button">Send</button>
+            </div>
+            <div class="hint" id="chat-hint">
+              Public chat aktif saat discussion. Mafia chat aktif saat night untuk mafia.
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 10px">
+            <div class="card-header">
+              <div class="card-title">Game Log</div>
+            </div>
+            <div class="log-list" id="log-list"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="win-overlay" id="win-overlay">
+      <div class="win-card">
+        <div class="win-title" id="win-title">GAME OVER</div>
+        <div class="win-sub" id="win-sub">Tim pemenang: -</div>
+        <button class="win-btn" type="button" id="btn-exit">
+          Back to Lobby
+        </button>
+      </div>
+    </div>
+
+    <script src="https://mafia-online-production-e4c1.up.railway.app/socket.io/socket.io.js"></script>
+    <script>
+      (function () {
+        const API_BASE = 'https://mafia-online-production-e4c1.up.railway.app';
+
+        let token = null;
+        let currentUser = null;
+        let roomCode = null;
+        let gameId = null;
+        let socket = null;
+
+        let phase = 'waiting';
+        let phaseDeadline = null;
+        let timerInterval = null;
+        let myRole = null;
+        let mafiaMembers = [];
+        const deadSet = new Set();
+        const voteCounts = {};
+        let activeChatType = 'public';
+
+        const roomLabel = document.getElementById('room-label');
+        const phasePill = document.getElementById('phase-pill');
+        const phaseLabel = document.getElementById('phase-label');
+        const timerLabel = document.getElementById('timer-label');
+
+        const roleBadge = document.getElementById('role-badge');
+        const roleLabel = document.getElementById('role-label');
+        const roleHint = document.getElementById('role-hint');
+
+        const playerListEl = document.getElementById('player-list');
+        const playerCountLabel = document.getElementById('player-count-label');
+
+        const nightPanel = document.getElementById('night-panel');
+        const nightLockedHint = document.getElementById('night-locked-hint');
+        const nightTargetSelect = document.getElementById('night-target-select');
+        const nightActionsRow = document.getElementById('night-actions-row');
+        const nightHint = document.getElementById('night-hint');
+
+        const votingListEl = document.getElementById('voting-list');
+        const votingChip = document.getElementById('voting-chip');
+
+        const tabPublic = document.getElementById('tab-public');
+        const tabMafia = document.getElementById('tab-mafia');
+        const chatModeChip = document.getElementById('chat-mode-chip');
+        const chatMessagesEl = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        const chatHint = document.getElementById('chat-hint');
+
+        const logList = document.getElementById('log-list');
+        const winOverlay = document.getElementById('win-overlay');
+        const winTitle = document.getElementById('win-title');
+        const winSub = document.getElementById('win-sub');
+        const btnExit = document.getElementById('btn-exit');
+
+        function loadLocalStorage() {
+          token = localStorage.getItem('token') || null;
+          const userStr = localStorage.getItem('user');
+          try {
+            currentUser = userStr ? JSON.parse(userStr) : null;
+          } catch (e) {
+            currentUser = null;
+          }
+          roomCode = localStorage.getItem('roomCode') || null;
+          gameId = localStorage.getItem('gameId') || null;
+
+          roomLabel.textContent = 'Room: ' + (roomCode || '-');
+        }
+
+        function log(message) {
+          const div = document.createElement('div');
+          div.className = 'log-entry';
+          const ts = new Date().toLocaleTimeString();
+          div.textContent = '[' + ts + '] ' + message;
+          logList.prepend(div);
+        }
+
+        function updatePhaseUI(newPhase, duration) {
+          phase = newPhase || 'waiting';
+
+          phasePill.classList.remove(
+            'phase-night',
+            'phase-discussion',
+            'phase-voting',
+            'phase-result'
+          );
+          const norm = phase.toLowerCase();
+          if (norm === 'night') phasePill.classList.add('phase-night');
+          else if (norm === 'discussion') phasePill.classList.add('phase-discussion');
+          else if (norm === 'voting') phasePill.classList.add('phase-voting');
+          else if (norm === 'result') phasePill.classList.add('phase-result');
+
+          phaseLabel.textContent = (phase || 'waiting').toUpperCase();
+
+          if (duration && duration > 0) {
+            phaseDeadline = Date.now() + duration * 1000;
+          } else {
+            phaseDeadline = null;
+            timerLabel.textContent = '00:00';
+          }
+
+          updateNightUI();
+          updateVotingUI();
+          updateChatPhaseUI();
+        }
+
+        function startTimer() {
+          if (timerInterval) clearInterval(timerInterval);
+          timerInterval = setInterval(() => {
+            if (!phaseDeadline) {
+              timerLabel.textContent = '00:00';
+              return;
+            }
+            const remaining = Math.max(0, phaseDeadline - Date.now());
+            const secs = Math.floor(remaining / 1000);
+            const mm = String(Math.floor(secs / 60)).padStart(2, '0');
+            const ss = String(secs % 60).padStart(2, '0');
+            timerLabel.textContent = mm + ':' + ss;
+          }, 250);
+        }
+
+        function setRole(role) {
+          myRole = role;
+          roleLabel.textContent = (role || 'unknown').toUpperCase();
+          roleBadge.classList.remove(
+            'role-mafia',
+            'role-doctor',
+            'role-detective',
+            'role-villager'
+          );
+          if (role === 'mafia') roleBadge.classList.add('role-mafia');
+          else if (role === 'doctor') roleBadge.classList.add('role-doctor');
+          else if (role === 'detective') roleBadge.classList.add('role-detective');
+          else roleBadge.classList.add('role-villager');
+
+          if (role === 'mafia') {
+            roleHint.textContent = 'Kamu Mafia. Eliminasi warga tanpa ketahuan.';
+          } else if (role === 'doctor') {
+            roleHint.textContent = 'Kamu Doctor. Selamatkan pemain dari serangan mafia.';
+          } else if (role === 'detective') {
+            roleHint.textContent = 'Kamu Detective. Investigasi pemain saat night.';
+          } else {
+            roleHint.textContent = 'Kamu Villager. Diskusi dan voting untuk menemukan mafia.';
+          }
+
+          updateNightUI();
+          updateChatPhaseUI();
+        }
+
+        function updatePlayers(roomPayload) {
+          const players = (roomPayload && roomPayload.players) || [];
+          playerListEl.innerHTML = '';
+          votingListEl.innerHTML = '';
+
+          let aliveCount = 0;
+
+          players.forEach((p) => {
+            const isDead = deadSet.has(String(p.id));
+            if (!isDead) aliveCount += 1;
+
+            const row = document.createElement('div');
+            row.className = 'player-row' + (isDead ? ' dead' : '');
+
+            const main = document.createElement('div');
+            main.className = 'player-main';
+            const avatar = document.createElement('div');
+            avatar.className = 'player-avatar';
+            avatar.textContent = (p.username || '?').charAt(0).toUpperCase();
+            const name = document.createElement('div');
+            name.className = 'player-name';
+            const nameMain = document.createElement('div');
+            nameMain.className = 'player-name-main';
+            nameMain.textContent = p.username || 'Unknown';
+            const tags = document.createElement('div');
+            tags.className = 'player-tags';
+            if (currentUser && String(p.id) === String(currentUser.id)) {
+              const t = document.createElement('span');
+              t.className = 'tag tag-you';
+              t.textContent = 'YOU';
+              tags.appendChild(t);
+            }
+            if (p.isHost) {
+              const t = document.createElement('span');
+              t.className = 'tag tag-host';
+              t.textContent = 'HOST';
+              tags.appendChild(t);
+            }
+            if (isDead) {
+              const t = document.createElement('span');
+              t.className = 'tag tag-dead';
+              t.textContent = 'DEAD';
+              tags.appendChild(t);
+            }
+            name.appendChild(nameMain);
+            name.appendChild(tags);
+
+            main.appendChild(avatar);
+            main.appendChild(name);
+
+            const readyCell = document.createElement('div');
+            const ready = document.createElement('div');
+            ready.className =
+              'ready-pill ' + (p.isReady ? 'ready-yes' : 'ready-no');
+            ready.textContent = p.isReady ? 'READY' : 'NOT READY';
+            readyCell.appendChild(ready);
+
+            const actionCell = document.createElement('div');
+            actionCell.style.textAlign = 'right';
+            if (phase === 'voting' && !isDead && currentUser && String(p.id) !== String(currentUser.id)) {
+              const btn = document.createElement('button');
+              btn.className = 'btn-small vote';
+              btn.textContent = 'VOTE';
+              btn.addEventListener('click', () => {
+                if (!socket || !gameId) return;
+                socket.emit('game:vote', { gameId, targetId: p.id });
+              });
+              actionCell.appendChild(btn);
+            } else if (voteCounts[p.id]) {
+              const span = document.createElement('span');
+              span.className = 'chip';
+              span.textContent = 'Votes: ' + voteCounts[p.id];
+              actionCell.appendChild(span);
+            }
+
+            row.appendChild(main);
+            row.appendChild(readyCell);
+            row.appendChild(actionCell);
+
+            playerListEl.appendChild(row);
+
+            // Voting list mirrors players for clarity
+            const vRow = row.cloneNode(true);
+            votingListEl.appendChild(vRow);
+          });
+
+          playerCountLabel.textContent = aliveCount + ' alive';
+
+          updateNightTargets(players);
+        }
+
+        function updateNightTargets(players) {
+          const list = players || [];
+          nightTargetSelect.innerHTML = '';
+          const aliveTargets = list.filter((p) => !deadSet.has(String(p.id)));
+          aliveTargets.forEach((p) => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.username || 'Unknown';
+            nightTargetSelect.appendChild(opt);
+          });
+        }
+
+        function updateNightUI() {
+          const isNight = phase === 'night';
+          const selectable = myRole === 'mafia' || myRole === 'doctor' || myRole === 'detective';
+          nightPanel.style.display = isNight && selectable ? 'block' : 'none';
+          nightLockedHint.style.display = isNight && selectable ? 'none' : 'block';
+
+          // Enable/disable action buttons by role
+          Array.from(nightActionsRow.querySelectorAll('.night-btn')).forEach((btn) => {
+            const action = btn.getAttribute('data-action');
+            if (myRole === 'mafia' && action === 'kill') {
+              btn.style.display = 'block';
+            } else if (myRole === 'doctor' && action === 'heal') {
+              btn.style.display = 'block';
+            } else if (myRole === 'detective' && action === 'investigate') {
+              btn.style.display = 'block';
+            } else {
+              btn.style.display = 'none';
+            }
+          });
+
+          if (!isNight) {
+            nightHint.textContent = 'Night action hanya tersedia saat phase night.';
+          } else if (myRole === 'mafia') {
+            nightHint.textContent = 'Pilih target untuk dibunuh oleh mafia.';
+          } else if (myRole === 'doctor') {
+            nightHint.textContent = 'Pilih target untuk diselamatkan dari serangan mafia.';
+          } else if (myRole === 'detective') {
+            nightHint.textContent = 'Pilih target untuk diinvestigasi.';
+          }
+        }
+
+        function updateVotingUI() {
+          votingChip.textContent = phase === 'voting' ? 'Voting open' : 'Waiting for voting';
+        }
+
+        function setChatTab(type) {
+          activeChatType = type;
+          tabPublic.classList.remove('active');
+          tabMafia.classList.remove('active');
+          if (type === 'public') tabPublic.classList.add('active');
+          else tabMafia.classList.add('active');
+          chatModeChip.textContent = type === 'public' ? 'Discussion' : 'Mafia';
+        }
+
+        function updateChatPhaseUI() {
+          let hint = '';
+          if (phase === 'discussion') {
+            hint = 'Public chat aktif. Mafia chat non-aktif.';
+          } else if (phase === 'night') {
+            if (myRole === 'mafia') {
+              hint = 'Mafia chat aktif. Public chat non-aktif.';
+            } else {
+              hint = 'Hanya mafia yang bisa chat saat night.';
+            }
+          } else {
+            hint = 'Chat terbatas. Tunggu phase discussion atau night.';
+          }
+          chatHint.textContent = hint;
+        }
+
+        function addChatMessage({ from, message, timestamp, type }) {
+          const line = document.createElement('div');
+          line.className = 'chat-line';
+          const meta = document.createElement('div');
+          meta.className = 'chat-meta';
+          const ts = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+          meta.textContent = '[' + ts + '] ' + (from || 'Unknown') + ' · ' + type;
+          const text = document.createElement('div');
+          text.className = 'chat-text';
+          text.textContent = message || '';
+          line.appendChild(meta);
+          line.appendChild(text);
+          chatMessagesEl.appendChild(line);
+          chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+        }
+
+        function connectSocket() {
+          if (!token || !window.io) {
+            log('Missing token or Socket.io client');
+            return;
+          }
+          socket = io(API_BASE, {
+            auth: { token },
+            transports: ['websocket', 'polling']
+          });
+
+          socket.on('connect', () => {
+            log('Connected to game server');
+            if (roomCode) {
+              socket.emit('room:join', { roomCode });
+            }
+          });
+
+          socket.on('disconnect', () => {
+            log('Disconnected from server');
+          });
+
+          socket.on('game:role', (payload) => {
+            if (!payload) return;
+            setRole(payload.role);
+            log('Role received: ' + payload.role);
+          });
+
+          socket.on('mafia:reveal', (payload) => {
+            mafiaMembers = payload && payload.mafiaUserIds ? payload.mafiaUserIds : [];
+            if (myRole === 'mafia') {
+              log('Mafia members: ' + mafiaMembers.join(', '));
+            }
+          });
+
+          socket.on('room:updated', (payload) => {
+            updatePlayers(payload);
+          });
+
+          socket.on('game:phase_changed', (payload) => {
+            if (!payload) return;
+            updatePhaseUI(payload.phase, payload.duration || 0);
+            phaseDeadline = Date.now() + (payload.duration || 0) * 1000;
+            startTimer();
+            log('Phase changed to ' + payload.phase);
+          });
+
+          socket.on('game:night_resolved', (payload) => {
+            if (!payload) return;
+            if (payload.killed) {
+              deadSet.add(String(payload.killed));
+              log('Night result: player ' + payload.killed + ' was killed');
+            } else if (payload.healed) {
+              log('Night result: target was healed');
+            } else {
+              log('Night result: no one died');
+            }
+          });
+
+          socket.on('game:vote_update', (payload) => {
+            if (!payload) return;
+            const cnt = payload.voteCount || {};
+            Object.keys(cnt).forEach((k) => {
+              voteCounts[k] = cnt[k];
+            });
+            log('Vote update received');
+          });
+
+          socket.on('game:voting_resolved', (payload) => {
+            if (!payload) return;
+            if (payload.eliminatedUserId) {
+              deadSet.add(String(payload.eliminatedUserId));
+              log(
+                'Voting result: player ' +
+                  payload.eliminatedUserId +
+                  ' eliminated with ' +
+                  payload.voteCount +
+                  ' votes'
+              );
+            } else {
+              log('Voting result: no one eliminated');
+            }
+          });
+
+          socket.on('game:ended', (payload) => {
+            if (!payload) return;
+            const winner = payload.winner || '-';
+            log('Game ended. Winner: ' + winner);
+            showWinOverlay(winner);
+          });
+
+          socket.on('chat:message', (payload) => {
+            if (!payload) return;
+            addChatMessage(payload);
+          });
+        }
+
+        function showWinOverlay(winner) {
+          winTitle.textContent =
+            winner === 'mafia'
+              ? 'Mafia Wins'
+              : winner === 'villager'
+              ? 'Villagers Win'
+              : 'Game Over';
+          winSub.textContent = 'Tim pemenang: ' + (winner || '-');
+          winOverlay.style.display = 'flex';
+        }
+
+        // Event handlers
+        Array.from(nightActionsRow.querySelectorAll('.night-btn')).forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if (!socket || !gameId) return;
+            const targetId = nightTargetSelect.value;
+            const actionType = btn.getAttribute('data-action');
+            if (!targetId || !actionType) return;
+            socket.emit('game:night_action', {
+              gameId,
+              targetId,
+              actionType
+            });
+            log('Night action sent: ' + actionType + ' -> ' + targetId);
+          });
+        });
+
+        tabPublic.addEventListener('click', () => {
+          setChatTab('public');
+        });
+
+        tabMafia.addEventListener('click', () => {
+          if (myRole !== 'mafia') return;
+          setChatTab('mafia');
+        });
+
+        chatSend.addEventListener('click', sendChat);
+        chatInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            sendChat();
+          }
+        });
+
+        function sendChat() {
+          if (!socket) return;
+          const message = chatInput.value.trim();
+          if (!message) return;
+
+          let type = activeChatType;
+          if (phase === 'discussion') {
+            type = 'public';
+          } else if (phase === 'night') {
+            type = myRole === 'mafia' ? 'mafia' : 'public';
+          }
+
+          socket.emit('chat:message', { message, type });
+          chatInput.value = '';
+        }
+
+        btnExit.addEventListener('click', () => {
+          window.location.href = 'lobby.html';
+        });
+
+        // Init
+        loadLocalStorage();
+        updatePhaseUI('waiting', 0);
+        startTimer();
+        connectSocket();
+      })();
+    </script>
+  </body>
+</html>
+

@@ -828,7 +828,7 @@
 
         btnStart.addEventListener('click', () => {
           if (!socket || !currentRoom) return;
-          socket.emit('game:start', { roomId: currentRoom.id });
+          socket.emit('game:start', { roomId: currentRoom.id, roomCode: currentRoom.code });
         });
 
         // Initial UI

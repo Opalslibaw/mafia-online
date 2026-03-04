@@ -31,6 +31,7 @@ function generateRoomCode() {
 
 function serializeRoom(room) {
   return {
+    id: room.id,
     code: room.code,
     hostId: room.host_id,
     status: room.status,
